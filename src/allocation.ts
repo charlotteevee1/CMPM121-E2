@@ -7,32 +7,52 @@ const readout = document.querySelector<HTMLParagraphElement>(
 )!;
 let crew = 2;
 
-function updateAllocationScreen() {
+type ShiftResults = {
+  crew: number;
+  totalProduction: number;
+  requiredSupplies: number;
+  supplyBalance: number;
+};
+
+function calculateShiftResults(crew: number): ShiftResults {
   const totalProduction = crew * 3;
   const requiredSupplies = 6;
   const supplyBalance = totalProduction - requiredSupplies;
+  return { crew, totalProduction, requiredSupplies, supplyBalance };
+}
+
+function drawAllocationScreen(results: ShiftResults) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let crewIndex = 0; crewIndex < 6; crewIndex++) {
-    ctx.fillStyle = crewIndex < crew ? "#27766b" : "#c9d2c9";
+    ctx.fillStyle = crewIndex < results.crew ? "#27766b" : "#c9d2c9";
     ctx.fillRect(18 + crewIndex * 45, 16, 36, 36);
-    ctx.fillStyle = crewIndex < crew ? "#ffffff" : "#233e43";
+    ctx.fillStyle = crewIndex < results.crew ? "#ffffff" : "#233e43";
     ctx.font = "16px system-ui";
     ctx.fillText(String(crewIndex + 1), 31 + crewIndex * 45, 40);
   }
   ctx.fillStyle = "#233e43";
   ctx.font = "14px system-ui";
-  ctx.fillText(`Producers: ${crew} / 6`, 18, 76);
-  ctx.fillText(`Production: ${totalProduction}`, 18, 102);
+  ctx.fillText(`Producers: ${results.crew} / 6`, 18, 76);
+  ctx.fillText(`Production: ${results.totalProduction}`, 18, 102);
   ctx.fillStyle = "#27766b";
-  ctx.fillRect(18, 110, totalProduction * 14, 20);
+  ctx.fillRect(18, 110, results.totalProduction * 14, 20);
   ctx.fillStyle = "#233e43";
-  ctx.fillText(`Consumption: ${requiredSupplies}`, 18, 154);
+  ctx.fillText(`Consumption: ${results.requiredSupplies}`, 18, 154);
   ctx.fillStyle = "#a44d23";
-  ctx.fillRect(18, 162, requiredSupplies * 14, 20);
+  ctx.fillRect(18, 162, results.requiredSupplies * 14, 20);
+}
+
+function displayShiftResults(results: ShiftResults) {
   readout.textContent =
-    `Assigned: ${crew}/6 · Production: ${totalProduction} · Consumption: ${requiredSupplies} · Balance: ${
-      supplyBalance > 0 ? "+" : ""
-    }${supplyBalance}`;
+    `Assigned: ${results.crew}/6 · Production: ${results.totalProduction} · Consumption: ${results.requiredSupplies} · Balance: ${
+      results.supplyBalance > 0 ? "+" : ""
+    }${results.supplyBalance}`;
+}
+
+function updateAllocationScreen() {
+  const results = calculateShiftResults(crew);
+  drawAllocationScreen(results);
+  displayShiftResults(results);
 }
 
 document.querySelector<HTMLButtonElement>("#allocation-less")!.onclick = () => {
