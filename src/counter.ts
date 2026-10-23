@@ -28,9 +28,7 @@ function shieldSnapshot(): Shield {
   };
 }
 
-shieldEvents.addEventListener("shield-change", () => {
-  drawMeter();
-});
+shieldEvents.addEventListener("shield-change", drawMeter);
 
 function drawMeter() {
   const snapshot = shieldSnapshot();
@@ -64,7 +62,6 @@ function setCount(next: number) {
   if (bounded === count) return;
   count = bounded;
   shieldEvents.dispatchEvent(new Event("shield-change"));
-  if (panel) updateStats();
 }
 
 document.querySelector<HTMLButtonElement>("#counter-less")!.onclick = () => {
@@ -78,12 +75,14 @@ document.querySelector<HTMLButtonElement>("#counter-reset")!.onclick = () => {
 };
 document.querySelector<HTMLButtonElement>("#counter-open")!.onclick = () => {
   if (panel) return;
+  shieldEvents.addEventListener("shield-change", updateStats);
   panel = document.createElement("p");
   host.append(panel);
   renderStats();
 };
 document.querySelector<HTMLButtonElement>("#counter-close")!.onclick = () => {
   if (!panel) return;
+  shieldEvents.removeEventListener("shield-change", updateStats);
   panel.remove();
   panel = null;
 };
