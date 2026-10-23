@@ -30,16 +30,34 @@ function drawAllocationScreen(results: ShiftResults) {
     ctx.font = "16px system-ui";
     ctx.fillText(String(crewIndex + 1), 31 + crewIndex * 45, 40);
   }
+
   ctx.fillStyle = "#233e43";
   ctx.font = "14px system-ui";
   ctx.fillText(`Producers: ${results.crew} / 6`, 18, 76);
-  ctx.fillText(`Production: ${results.totalProduction}`, 18, 102);
-  ctx.fillStyle = "#27766b";
-  ctx.fillRect(18, 110, results.totalProduction * 14, 20);
-  ctx.fillStyle = "#233e43";
-  ctx.fillText(`Consumption: ${results.requiredSupplies}`, 18, 154);
-  ctx.fillStyle = "#a44d23";
-  ctx.fillRect(18, 162, results.requiredSupplies * 14, 20);
+
+  type DisplayRecord = {
+    label: string;
+    value: number;
+    color: string;
+  };
+
+  const displayRecords: DisplayRecord[] = [
+    { label: "Production", value: results.totalProduction, color: "#27766b" },
+    { label: "Consumption", value: results.requiredSupplies, color: "#a44d23" },
+  ];
+
+  for (let i = 0; i < displayRecords.length; i++) {
+    const record = displayRecords[i];
+    const textY = 102 + i * 52;
+    const barY = 110 + i * 52;
+
+    // Color for the text
+    ctx.fillStyle = "#233e43";
+    ctx.fillText(`${record.label}: ${record.value}`, 18, textY);
+    // Color for the bar
+    ctx.fillStyle = record.color;
+    ctx.fillRect(18, barY, record.value * 14, 20);
+  }
 }
 
 function displayShiftResults(results: ShiftResults) {
